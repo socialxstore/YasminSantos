@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yasmin Santos — Instagram Content Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A96E;
+    --gold-light: #E8D5A3;
+    --cream: #FAF7F2;
+    --ink: #0F0E0C;
+    --charcoal: #1C1A17;
+    --warm-gray: #8A8478;
+    --blush: #E8C4B0;
+    --accent: #D4735A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--ink);
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.6;
+  }
+
+  .masthead {
+    border-bottom: 1px solid rgba(201,169,110,0.2);
+    padding: 2.5rem 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(180deg, rgba(201,169,110,0.05) 0%, transparent 100%);
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .masthead-left { display: flex; align-items: center; gap: 1.5rem; }
+
+  .logo-mark {
+    width: 52px; height: 52px;
+    border: 1.5px solid var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--gold);
+    letter-spacing: 0.02em;
+  }
+
+  .masthead h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--cream);
+  }
+
+  .masthead h1 span { color: var(--gold); }
+
+  .masthead-right {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--warm-gray);
+    text-align: right;
+    line-height: 1.8;
+  }
+
+  .masthead-right strong { color: var(--gold-light); }
+
+  /* STRATEGY BAR */
+  .strategy-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-bottom: 1px solid rgba(201,169,110,0.15);
+    animation: fadeUp 0.9s 0.1s ease both;
+  }
+
+  .stat-box {
+    padding: 1.8rem 2rem;
+    border-right: 1px solid rgba(201,169,110,0.1);
+    transition: background 0.3s;
+  }
+  .stat-box:last-child { border-right: none; }
+  .stat-box:hover { background: rgba(201,169,110,0.04); }
+
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--warm-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--gold);
+    margin-bottom: 0.3rem;
+  }
+
+  .stat-note {
+    font-size: 0.78rem;
+    color: var(--warm-gray);
+    line-height: 1.4;
+  }
+
+  /* MAIN LAYOUT */
+  .main { padding: 3rem 4rem; max-width: 1440px; margin: 0 auto; }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+  }
+
+  .section-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(201,169,110,0.4), transparent);
+  }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--warm-gray);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* WEEK GRID */
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5px;
+    background: rgba(201,169,110,0.12);
+    border: 1px solid rgba(201,169,110,0.12);
+    margin-bottom: 4rem;
+    animation: fadeUp 1s 0.2s ease both;
+  }
+
+  .post-card {
+    background: var(--charcoal);
+    padding: 2rem 1.8rem;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+    overflow: hidden;
+  }
+
+  .post-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+
+  .post-card:hover { background: #221f1a; }
+  .post-card:hover::before { transform: scaleX(1); }
+
+  .post-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--warm-gray);
+    letter-spacing: 0.2em;
+    margin-bottom: 0.8rem;
+  }
+
+  .post-day {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--cream);
+    margin-bottom: 0.2rem;
+  }
+
+  .post-time {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--gold);
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .post-time::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .format-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 2px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    font-weight: 700;
+  }
+
+  .badge-carousel { background: rgba(212,115,90,0.15); color: var(--accent); border: 1px solid rgba(212,115,90,0.3); }
+  .badge-reel { background: rgba(201,169,110,0.12); color: var(--gold); border: 1px solid rgba(201,169,110,0.25); }
+  .badge-photo { background: rgba(232,196,176,0.1); color: var(--blush); border: 1px solid rgba(232,196,176,0.2); }
+
+  .post-topic {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--cream);
+    margin-bottom: 0.8rem;
+    line-height: 1.4;
+  }
+
+  .hook-section {
+    background: rgba(201,169,110,0.06);
+    border-left: 2px solid var(--gold);
+    padding: 0.8rem 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .hook-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+
+  .hook-text {
+    font-size: 0.85rem;
+    color: var(--cream);
+    font-weight: 500;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  .content-breakdown {
+    margin-bottom: 1rem;
+  }
+
+  .content-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    color: var(--warm-gray);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .content-text {
+    font-size: 0.82rem;
+    color: #B0AC9E;
+    line-height: 1.6;
+  }
+
+  .cta-section {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(201,169,110,0.1);
+    padding: 0.7rem 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  .cta-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+
+  .cta-text {
+    font-size: 0.82rem;
+    color: var(--cream);
+    font-weight: 500;
+  }
+
+  .hashtags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.8rem;
+  }
+
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    color: var(--warm-gray);
+    background: rgba(255,255,255,0.04);
+    padding: 0.2rem 0.5rem;
+    border-radius: 2px;
+    transition: color 0.2s, background 0.2s;
+    cursor: pointer;
+  }
+
+  .tag:hover { color: var(--gold-light); background: rgba(201,169,110,0.08); }
+
+  /* STORIES SECTION */
+  .stories-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1rem;
+    margin-bottom: 4rem;
+    animation: fadeUp 1s 0.3s ease both;
+  }
+
+  .story-card {
+    background: var(--charcoal);
+    border: 1px solid rgba(201,169,110,0.1);
+    padding: 1.2rem;
+    position: relative;
+    transition: all 0.3s;
+  }
+
+  .story-card:hover {
+    border-color: rgba(201,169,110,0.35);
+    transform: translateY(-2px);
+  }
+
+  .story-day-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid rgba(201,169,110,0.12);
+  }
+
+  .story-item {
+    font-size: 0.75rem;
+    color: #9E9A8F;
+    margin-bottom: 0.5rem;
+    padding-left: 0.7rem;
+    border-left: 1.5px solid rgba(201,169,110,0.2);
+    line-height: 1.5;
+  }
+
+  .story-item strong { color: var(--blush); font-weight: 500; display: block; font-size: 0.72rem; }
+
+  /* TIMING CHART */
+  .timing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 4rem;
+    animation: fadeUp 1s 0.4s ease both;
+  }
+
+  .timing-card {
+    background: var(--charcoal);
+    border: 1px solid rgba(201,169,110,0.12);
+    padding: 2rem;
+  }
+
+  .timing-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    color: var(--gold-light);
+  }
+
+  .time-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .time-slot {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--gold);
+    min-width: 80px;
+  }
+
+  .time-bar-wrap {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .time-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--accent));
+    border-radius: 2px;
+    transition: width 1.5s ease;
+  }
+
+  .time-label {
+    font-size: 0.72rem;
+    color: var(--warm-gray);
+    min-width: 120px;
+    text-align: right;
+  }
+
+  /* CAPTION TEMPLATES */
+  .caption-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+    animation: fadeUp 1s 0.5s ease both;
+  }
+
+  .caption-card {
+    background: var(--charcoal);
+    border: 1px solid rgba(201,169,110,0.1);
+    padding: 1.8rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .caption-card::after {
+    content: '"';
+    position: absolute;
+    bottom: -1rem;
+    right: 1rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 8rem;
+    color: rgba(201,169,110,0.05);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .caption-type {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .caption-body {
+    font-size: 0.85rem;
+    color: var(--cream);
+    line-height: 1.75;
+    white-space: pre-line;
+  }
+
+  .copy-btn {
+    margin-top: 1.2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid rgba(201,169,110,0.25);
+    color: var(--gold);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .copy-btn:hover {
+    background: rgba(201,169,110,0.08);
+    border-color: var(--gold);
+  }
+
+  .copy-btn.copied {
+    background: rgba(201,169,110,0.12);
+    color: var(--gold-light);
+  }
+
+  /* FOOTER */
+  .footer-note {
+    border-top: 1px solid rgba(201,169,110,0.12);
+    padding: 2rem 4rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    animation: fadeUp 1s 0.6s ease both;
+  }
+
+  .footer-col-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+  }
+
+  .footer-col-text {
+    font-size: 0.8rem;
+    color: var(--warm-gray);
+    line-height: 1.7;
+  }
+
+  .footer-col-text li {
+    margin-bottom: 0.4rem;
+    list-style: none;
+    padding-left: 1rem;
+    position: relative;
+  }
+
+  .footer-col-text li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-size: 0.7rem;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* PRINT/COPY */
+  .print-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.5rem;
+    background: var(--gold);
+    color: var(--ink);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.2s;
+  }
+
+  .print-btn:hover { background: var(--gold-light); }
+
+  .stories-note {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--warm-gray);
+    letter-spacing: 0.1em;
+    margin-bottom: 1.5rem;
+    margin-top: -0.5rem;
+  }
+
+  @media (max-width: 1100px) {
+    .week-grid { grid-template-columns: 1fr 1fr; }
+    .stories-grid { grid-template-columns: repeat(4, 1fr); }
+    .masthead { padding: 1.5rem 2rem; }
+    .main { padding: 2rem; }
+    .footer-note { padding: 2rem; }
+  }
+
+  @media (max-width: 700px) {
+    .week-grid { grid-template-columns: 1fr; }
+    .stories-grid { grid-template-columns: repeat(2, 1fr); }
+    .timing-grid { grid-template-columns: 1fr; }
+    .caption-grid { grid-template-columns: 1fr; }
+    .strategy-bar { grid-template-columns: 1fr 1fr; }
+    .footer-note { grid-template-columns: 1fr; }
+    .masthead-right { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-left">
+    <div class="logo-mark">YS</div>
+    <div>
+      <h1>Yasmin Santos <span>Content Planner</span></h1>
+      <div style="font-size:0.75rem; color:var(--warm-gray); margin-top:0.2rem;">@iamyasminsantoss · Fashion Model · 2–3 posts/week</div>
+    </div>
+  </div>
+  <div class="masthead-right">
+    <strong>AUDIENCE</strong> 18–40 · Mixed EU + US<br>
+    <strong>NICHE</strong> Fashion / Luxury Lifestyle<br>
+    <strong>GOAL</strong> Grow · Engage · Convert
+  </div>
+</header>
+
+<div class="strategy-bar">
+  <div class="stat-box">
+    <div class="stat-label">Posting Cadence</div>
+    <div class="stat-value">3×/week</div>
+    <div class="stat-note">Mon + Wed + Fri — optimal for algorithm reach without oversaturation</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">Format Mix</div>
+    <div class="stat-value">40/35/25</div>
+    <div class="stat-note">40% Reels · 35% Carousel · 25% Single Photo</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">Peak Windows (CET)</div>
+    <div class="stat-value">18:00–20:00</div>
+    <div class="stat-note">Best overlap for DK + UK + US East Coast morning scroll</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">Stories</div>
+    <div class="stat-value">Daily</div>
+    <div class="stat-note">2–4 stories/day keeps you top-of-feed. Polls + questions boost reach</div>
+  </div>
+</div>
+
+<main class="main">
+
+  <!-- WEEK 1 POSTS -->
+  <div class="section-header">
+    <div class="section-label">Week A</div>
+    <div class="section-title">Core Schedule</div>
+    <div class="section-rule"></div>
+    <button class="print-btn" onclick="window.print()">↓ Save PDF</button>
+  </div>
+
+  <div class="week-grid">
+
+    <!-- POST 1 -->
+    <div class="post-card">
+      <div class="post-number">POST 01 · MONDAY</div>
+      <div class="post-day">Monday</div>
+      <div class="post-time">18:30 CET / 12:30 EST</div>
+      <span class="format-badge badge-carousel">📂 Carousel · 6–8 slides</span>
+      <div class="post-topic">✦ "My Airport-to-Event Formula — 3 Looks, 1 Bag"</div>
+      <div class="hook-section">
+        <div class="hook-label">Opening Hook (Slide 1)</div>
+        <div class="hook-text">"I travel 180 days a year. Here's how I never check a bag and still walk into every event looking like I planned it for weeks."</div>
+      </div>
+      <div class="content-breakdown">
+        <div class="content-label">Slides Breakdown</div>
+        <div class="content-text">S1: Hook statement over moody travel photo · S2: "The bag rule I never break" · S3–5: Look 1, 2, 3 styled full-body shots · S6: Flat-lay of essentials · S7: "The secret item" (engagement slide) · S8: Save this post + CTA</div>
+      </div>
+      <div class="cta-section">
+        <div class="cta-label">CTA</div>
+        <div class="cta-text">"Save this before your next trip. Which look would you wear? Drop a 1, 2 or 3 below 👇"</div>
+      </div>
+      <div class="hashtags">
+        <span class="tag">#FashionModel</span><span class="tag">#TravelStyle</span><span class="tag">#AirportFashion</span><span class="tag">#OOTDinspo</span><span class="tag">#ModelLife</span><span class="tag">#DenmarkFashion</span><span class="tag">#StyleTips</span>
+      </div>
+    </div>
+
+    <!-- POST 2 -->
+    <div class="post-card">
+      <div class="post-number">POST 02 · WEDNESDAY</div>
+      <div class="post-day">Wednesday</div>
+      <div class="post-time">19:00 CET / 13:00 EST</div>
+      <span class="format-badge badge-reel">🎬 Reel · 15–30 sec</span>
+      <div class="post-topic">✦ "Get Ready With Me — Miss Woman Spain 2026 Look"</div>
+      <div class="hook-section">
+        <div class="hook-label">First 2 Seconds (On-screen text)</div>
+        <div class="hook-text">"POV: You're representing your country in a room full of cameras. No pressure."</div>
+      </div>
+      <div class="content-breakdown">
+        <div class="content-label">Video Flow</div>
+        <div class="content-text">Open on mirror selfie teaser → quick cuts of getting ready (makeup, dress, shoes) → slow-motion final reveal walk → end card with title overlay "Miss Woman Spain 2026" · trending audio (elegant/confident vibe) · text overlays throughout</div>
+      </div>
+      <div class="cta-section">
+        <div class="cta-label">CTA</div>
+        <div class="cta-text">"Follow along for more behind-the-scenes from the competition 🏆 — Drop a ⚡ if you want the full story."</div>
+      </div>
+      <div class="hashtags">
+        <span class="tag">#GRWM</span><span class="tag">#MissWoman</span><span class="tag">#PageantLife</span><span class="tag">#ModelDiary</span><span class="tag">#FashionReel</span><span class="tag">#BeautyAndFashion</span>
+      </div>
+    </div>
+
+    <!-- POST 3 -->
+    <div class="post-card">
+      <div class="post-number">POST 03 · FRIDAY</div>
+      <div class="post-day">Friday</div>
+      <div class="post-time">18:00 CET / 12:00 EST</div>
+      <span class="format-badge badge-photo">📸 Single Photo</span>
+      <div class="post-topic">✦ High-editorial shot — "Silence is the loudest statement."</div>
+      <div class="hook-section">
+        <div class="hook-label">Caption Hook</div>
+        <div class="hook-text">"Some outfits don't need an explanation. Some days, neither do I."</div>
+      </div>
+      <div class="content-breakdown">
+        <div class="content-label">Image Direction</div>
+        <div class="content-text">One strong editorial image — minimal background, bold look, confident expression. Let the photo speak. Caption stays short and poetic. This post is for brand image and saves/shares.</div>
+      </div>
+      <div class="cta-section">
+        <div class="cta-label">CTA</div>
+        <div class="cta-text">"Tag someone who needs to see this energy today. ⚡"</div>
+      </div>
+      <div class="hashtags">
+        <span class="tag">#EditorialFashion</span><span class="tag">#HighFashion</span><span class="tag">#ModelShoot</span><span class="tag">#MoodBoard</span><span class="tag">#FashionPhotography</span><span class="tag">#StyleInspiration</span>
+      </div>
+    </div>
+
+    <!-- POST 4 (Week B starts) -->
+    <div class="post-card">
+      <div class="post-number">POST 04 · MONDAY</div>
+      <div class="post-day">Monday</div>
+      <div class="post-time">19:00 CET / 13:00 EST</div>
+      <span class="format-badge badge-reel">🎬 Reel · 20–40 sec</span>
+      <div class="post-topic">✦ "Day in My Life — Model Edition (City Name)"</div>
+      <div class="hook-section">
+        <div class="hook-label">First 2 Seconds</div>
+        <div class="hook-text">"6am. New city. Here's what a real model day actually looks like — not the highlight reel."</div>
+      </div>
+      <div class="content-breakdown">
+        <div class="content-label">Video Flow</div>
+        <div class="content-text">Alarm going off → morning coffee shot → outfit OOTD clip → casting / shoot / event moment → evening look → quick recap clips with timestamps as text overlays · authentic, slightly raw feel · trending audio</div>
+      </div>
+      <div class="cta-section">
+        <div class="cta-label">CTA</div>
+        <div class="cta-text">"Follow for more days like this. Where should I go next? 🌍"</div>
+      </div>
+      <div class="hashtags">
+        <span class="tag">#DayInMyLife</span><span class="tag">#ModelDiaries</span><span class="tag">#ModelLife</span><span class="tag">#BehindTheScenes</span><span class="tag">#FashionVlog</span><span class="tag">#Wanderlust</span>
+      </div>
+    </div>
+
+    <!-- POST 5 -->
+    <div class="post-card">
+      <div class="post-number">POST 05 · WEDNESDAY</div>
+      <div class="post-day">Wednesday</div>
+      <div class="post-time">18:00 CET / 12:00 EST</div>
+      <span class="format-badge badge-carousel">📂 Carousel · 5–7 slides</span>
+      <div class="post-topic">✦ "The 5 Style Rules I Learned Competing Across Europe"</div>
+      <div class="hook-section">
+        <div class="hook-label">Opening Hook (Slide 1)</div>
+        <div class="hook-text">"I've been styled in 7 countries. The stylists who actually knew their craft all said the same 5 things. Here they are."</div>
+      </div>
+      <div class="content-breakdown">
+        <div class="content-label">Slides Breakdown</div>
+        <div class="content-text">S1: Hook + clean cover photo · S2–6: One rule per slide with strong image and bold text overlay · S7: "Which rule surprised you most?" engagement question · Consistent branded font/color overlay throughout for saves</div>
+      </div>
+      <div class="cta-section">
+        <div class="cta-label">CTA</div>
+        <div class="cta-text">"Save this for when you have a big event coming up. Which rule do you already follow?"</div>
+      </div>
+      <div class="hashtags">
+        <span class="tag">#StyleRules</span><span class="tag">#FashionTips</span><span class="tag">#HowToDressWell</span><span class="tag">#EuropeanFashion</span><span class="tag">#StyleGuide</span><span class="tag">#WomenInFashion</span>
+      </div>
+    </div>
+
+    <!-- POST 6 -->
+    <div class="post-card">
+      <div class="post-number">POST 06 · FRIDAY</div>
+      <div class="post-day">Friday</div>
+      <div class="post-time">19:30 CET / 13:30 EST</div>
+      <span class="format-badge badge-reel">🎬 Reel · 15–25 sec</span>
+      <div class="post-topic">✦ "Outfit Transition — Same Girl, Different Energy"</div>
+      <div class="hook-section">
+        <div class="hook-label">First 2 Seconds</div>
+        <div class="hook-text">"She's not two different people. She's just dressed for the moment."</div>
+      </div>
+      <div class="content-breakdown">
+        <div class="content-label">Video Flow</div>
+        <div class="content-text">Classic outfit transition Reel — casual/daytime look → hand covers camera → evening/glam reveal. Execute with a clean transition, strong trending audio, confident body language. Can do 2–3 transitions. Text overlays: "Daytime Yasmin" → "Evening Yasmin"</div>
+      </div>
+      <div class="cta-section">
+        <div class="cta-label">CTA</div>
+        <div class="cta-text">"Which version are you today? Casual or glam? 💛 Follow for more looks."</div>
+      </div>
+      <div class="hashtags">
+        <span class="tag">#OutfitTransition</span><span class="tag">#OOTD</span><span class="tag">#FashionReel</span><span class="tag">#StyleSwitch</span><span class="tag">#GlamLook</span><span class="tag">#DailyFashion</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- STORIES SECTION -->
+  <div class="section-header">
+    <div class="section-label">Daily</div>
+    <div class="section-title">Stories Schedule</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="stories-note">Post 2–4 stories/day · Always include 1 interactive element (poll/question/slider) · Repost all feed posts to stories within 30min of publishing</div>
+
+  <div class="stories-grid">
+    <div class="story-card">
+      <div class="story-day-label">Monday</div>
+      <div class="story-item"><strong>Morning (8–10am)</strong>Coffee/morning routine shot. "Starting the week with..." poll</div>
+      <div class="story-item"><strong>Afternoon</strong>Behind-scenes of post prep / shoot day clips</div>
+      <div class="story-item"><strong>Evening</strong>Repost feed post with swipe-up or "New post 👆" sticker</div>
+    </div>
+    <div class="story-card">
+      <div class="story-day-label">Tuesday</div>
+      <div class="story-item"><strong>Morning</strong>Fashion tip or quote card from a stylish source</div>
+      <div class="story-item"><strong>Midday</strong>Question box: "Ask me anything about modelling / style"</div>
+      <div class="story-item"><strong>Evening</strong>Reply to 2–3 Q&A answers on stories → boosts DMs</div>
+    </div>
+    <div class="story-card">
+      <div class="story-day-label">Wednesday</div>
+      <div class="story-item"><strong>Morning</strong>OOTD mirror clip — same outfit as Reel post teaser</div>
+      <div class="story-item"><strong>Midday</strong>Reel repost + "Which look is your fav" slider</div>
+      <div class="story-item"><strong>Evening</strong>Poll: "Next Reel should be: Travel content vs GRWM?"</div>
+    </div>
+    <div class="story-card">
+      <div class="story-day-label">Thursday</div>
+      <div class="story-item"><strong>Morning</strong>"This or That" outfit poll — 2 looks, audience votes</div>
+      <div class="story-item"><strong>Midday</strong>Candid shot — city, shoot location, or travel moment</div>
+      <div class="story-item"><strong>Evening</strong>Share a brand/boutique you love (potential collab bait)</div>
+    </div>
+    <div class="story-card">
+      <div class="story-day-label">Friday</div>
+      <div class="story-item"><strong>Morning</strong>Weekend mood board — 3–4 images in collage</div>
+      <div class="story-item"><strong>Post-publish</strong>Repost Friday feed post within 30min</div>
+      <div class="story-item"><strong>Evening</strong>"What are you doing this weekend?" question sticker</div>
+    </div>
+    <div class="story-card">
+      <div class="story-day-label">Saturday</div>
+      <div class="story-item"><strong>Anytime</strong>Raw/candid content — genuine moment, no filter needed</div>
+      <div class="story-item"><strong>Afternoon</strong>Countdown sticker for upcoming post/event/drop</div>
+      <div class="story-item"><strong>Evening</strong>Re-share best comment from week's posts</div>
+    </div>
+    <div class="story-card">
+      <div class="story-day-label">Sunday</div>
+      <div class="story-item"><strong>Morning</strong>Soft, aesthetic Sunday content — slow/calm energy</div>
+      <div class="story-item"><strong>Afternoon</strong>"Coming this week 👀" — teaser clip for Mon post</div>
+      <div class="story-item"><strong>Evening</strong>Poll: "What content do you want more of next week?"</div>
+    </div>
+  </div>
+
+  <!-- TIMING CHART -->
+  <div class="section-header">
+    <div class="section-label">Data-Backed</div>
+    <div class="section-title">Posting Time Strategy</div>
+    <div class="section-rule"></div>
+  </div>
+
+  <div class="timing-grid">
+    <div class="timing-card">
+      <div class="timing-title">Best Windows — CET (Denmark / Europe)</div>
+      <div class="time-row">
+        <div class="time-slot">18:00–20:00</div>
+        <div class="time-bar-wrap"><div class="time-bar" style="width:95%"></div></div>
+        <div class="time-label">🔥 Peak — post-work scroll</div>
+      </div>
+      <div class="time-row">
+        <div class="time-slot">12:00–13:00</div>
+        <div class="time-bar-wrap"><div class="time-bar" style="width:75%"></div></div>
+        <div class="time-label">Good — lunch browse</div>
+      </div>
+      <div class="time-row">
+        <div class="time-slot">08:00–09:00</div>
+        <div class="time-bar-wrap"><div class="time-bar" style="width:55%"></div></div>
+        <div class="time-label">Solid — morning commute</div>
+      </div>
+      <div class="time-row">
+        <div class="time-slot">21:00–22:00</div>
+        <div class="time-bar-wrap"><div class="time-bar" style="width:65%"></div></div>
+        <div class="time-label">Late scroll window</div>
+      </div>
+    </div>
+    <div class="timing-card">
+      <div class="timing-title">Overlap Windows — When Traveling USA (EST)</div>
+      <div class="time-row">
+        <div class="time-slot">12:00–14:00</div>
+        <div class="time-bar-wrap"><div class="time-bar" style="width:90%"></div></div>
+        <div class="time-label">🔥 Best — hits EU eve + US lunch</div>
+      </div>
+      <div class="time-row">
+        <div class="time-slot">18:00–20:00</div>
+        <div class="time-bar-wrap"><div class="time-bar" style="width:80%"></div></div>
+        <div class="time-label">Strong US evening peak</div>
+      </div>
+      <div class="time-row">
+        <div class="time-slot">08:00–09:00</div>
+        <div class="time-bar-wrap"><div class="time-bar" style="width:50%"></div></div>
+        <div class="time-label">Hits EU afternoon</div>
+      </div>
+      <div style="margin-top:1rem; padding: 0.8rem; background: rgba(201,169,110,0.06); border-left: 2px solid var(--gold);">
+        <div style="font-size:0.75rem; color:var(--gold-light); font-weight:500;">Pro Tip</div>
+        <div style="font-size:0.78rem; color:var(--warm-gray); margin-top:0.3rem; line-height:1.5;">When in US, post at 12:00–13:00 EST. This hits 18:00–19:00 CET simultaneously — your EU audience's prime time stays covered.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- READY-TO-PASTE CAPTIONS -->
+  <div class="section-header">
+    <div class="section-label">Copy–Paste Ready</div>
+    <div class="section-title">Caption Templates</div>
+    <div class="section-rule"></div>
+  </div>
+
+  <div class="caption-grid">
+
+    <div class="caption-card">
+      <div class="caption-type">Template 01 · Carousel / Educational</div>
+      <div class="caption-body" id="cap1">I've been on runways in 7 countries.
+
+And every single time, it came down to the same thing: knowing yourself before the stylist gets to you.
+
+Here are the 5 style rules I now live by — swipe to see them all.
+
+Save this. You'll thank yourself before your next big event.
+
+Which rule hits different for you? Drop it below 👇
+
+.
+.
+#FashionModel #StyleTips #ModelLife #OOTDinspo #EuropeanFashion #HowToDressWell #MissEurope</div>
+      <button class="copy-btn" onclick="copyCaption('cap1', this)">⊕ Copy Caption</button>
+    </div>
+
+    <div class="caption-card">
+      <div class="caption-type">Template 02 · Reel / Personal Story</div>
+      <div class="caption-body" id="cap2">Nobody sees the 5am wake-up calls.
+The cities that blur together.
+The smile you hold no matter how exhausted you are.
+
+This is what I signed up for — and I'd choose it every single time.
+
+Miss Europe Continental – Denmark 2025 ⚡
+Miss Woman – Spain 2026 👑
+Rising Star Award – IMA 2026 🏆
+
+Follow along. The next chapter is just getting started.
+
+.
+.
+#ModelLife #BehindTheScenes #DayInMyLife #FashionReel #MissEurope #PageantLife</div>
+      <button class="copy-btn" onclick="copyCaption('cap2', this)">⊕ Copy Caption</button>
+    </div>
+
+    <div class="caption-card">
+      <div class="caption-type">Template 03 · Single Photo / Editorial</div>
+      <div class="caption-body" id="cap3">Some looks don't need a caption.
+
+But I'll give you one anyway:
+Wear what makes you stand still in front of the mirror.
+That's the whole rule.
+
+📩 Collabs & bookings: management@yasminsantos.eu
+
+.
+.
+#EditorialFashion #HighFashion #ModelShoot #FashionPhotography #MoodBoard #StyleInspiration #DenmarkFashion</div>
+      <button class="copy-btn" onclick="copyCaption('cap3', this)">⊕ Copy Caption</button>
+    </div>
+
+  </div>
+
+</main>
+
+<div class="footer-note">
+  <div>
+    <div class="footer-col-title">Content Pillars (Rotate These)</div>
+    <ul class="footer-col-text">
+      <li>Behind-the-scenes model life</li>
+      <li>Editorial / campaign photos</li>
+      <li>Travel style & packing</li>
+      <li>Competition / pageant journey</li>
+      <li>Style education (tips & rules)</li>
+      <li>Personal / authentic moments</li>
+    </ul>
+  </div>
+  <div>
+    <div class="footer-col-title">Growth Tactics</div>
+    <ul class="footer-col-text">
+      <li>Reply to EVERY comment in first 60min</li>
+      <li>Use location tags when traveling</li>
+      <li>Collab Reels with brands or models</li>
+      <li>Share to Stories immediately after posting</li>
+      <li>Pin 3 best-performing posts to profile</li>
+      <li>Add close friends stories for VIP feel</li>
+    </ul>
+  </div>
+  <div>
+    <div class="footer-col-title">Monthly Review Checklist</div>
+    <ul class="footer-col-text">
+      <li>Check which format got most saves</li>
+      <li>Check which day/time got most reach</li>
+      <li>Double down on top 2 post types</li>
+      <li>Retire formats with low engagement</li>
+      <li>Update hashtag sets monthly</li>
+      <li>Screenshot wins + track follower growth</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  function copyCaption(id, btn) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = '⊕ Copy Caption';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // Animate bars on load
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.time-bar').forEach(bar => {
+      const w = bar.style.width;
+      bar.style.width = '0%';
+      setTimeout(() => { bar.style.width = w; }, 500);
+    });
+  });
+</script>
+</body>
+</html>
